@@ -5,7 +5,7 @@ import { VitePWA } from "vite-plugin-pwa";
 // Si lo publicás en GitHub Pages bajo un subdirectorio (p. ej.
 // jogretoco88.github.io/mexilink-inventario/), cambiá base a "/mexilink-inventario/".
 export default defineConfig({
-  base: "./",
+  base: "/inventario-mexilink2/",
   plugins: [
     react(),
     VitePWA({

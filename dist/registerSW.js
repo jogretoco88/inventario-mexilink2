@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/inventario-mexilink2/sw.js', { scope: '/inventario-mexilink2/' })})}
