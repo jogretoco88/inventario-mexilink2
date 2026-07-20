@@ -6,6 +6,9 @@ import { VitePWA } from "vite-plugin-pwa";
 // jogretoco88.github.io/mexilink-inventario/), cambiá base a "/mexilink-inventario/".
 export default defineConfig({
   base: "/inventario-mexilink2/",
+   build: {
+       outDir: "docs",
+     },
   plugins: [
     react(),
     VitePWA({
