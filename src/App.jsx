@@ -28,7 +28,7 @@ const RAW_PRODUCTS = [
   { id: "p15", name: "DE LA ROSA PULPARINDO ROJO", sec: 7, cost: 3.32, factorCaja: 32, hasDisplay: false, factorDisplay: 1 },
   { id: "p16", name: "LORENA MINI PELON", sec: 7, cost: 2.79, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
   { id: "p17", name: "LORENA PELON RICO CHAMOY 12ct", sec: 7, cost: 5.18, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p18", name: "LORENA MINI PELON SURTIDO", sec: 7, cost: 2.79, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
+  { id: "p18", name: "LORENA MINI PELON SURTIDO", sec: 7, cost: 4.04, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
   { id: "p19", name: "JARRITOS REGULAR GUMMIES", sec: 6, cost: 2.68, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
   { id: "p20", name: "RICOLINO PALETA PAYASO", sec: 6, cost: 0.8, factorCaja: 60, hasDisplay: true, factorDisplay: 10 },
   { id: "p21", name: "RICOLINO BUBU LUBU", sec: 6, cost: 0.64, factorCaja: 192, hasDisplay: true, factorDisplay: 24 },
@@ -41,7 +41,7 @@ const RAW_PRODUCTS = [
   { id: "p28", name: "LUCAS SKWNKLES RELLENOS", sec: 5, cost: 0.59, factorCaja: 288, hasDisplay: true, factorDisplay: 12 },
   { id: "p29", name: "LUCAS SKWNKLES CHUNKS", sec: 5, cost: 2.91, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
   { id: "p30", name: "SALSAGHETI KING SIZE SANDIA", sec: 5, cost: 1.41, factorCaja: 120, hasDisplay: true, factorDisplay: 6 },
-  { id: "p31", name: "LUCAS SALSAGHETI MANGO", sec: 5, cost: 7.18, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p31", name: "LUCAS SALSAGHETI MANGO", sec: 5, cost: 7.18, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
   { id: "p32", name: "TAJIN PALETA BOLSA CHICA", sec: 4, cost: 2.8, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
   { id: "p33", name: "BONBONUM TROPICAL", sec: 4, cost: 1.53, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
   { id: "p34", name: "ZUMBA PALETA TAMARINDO", sec: 4, cost: 5.82, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
@@ -173,7 +173,15 @@ export default function App() {
   const [entries, setEntries] = useState(() => {
     const saved = storage.load();
     const base = {};
-    for (const p of RAW_PRODUCTS) base[p.id] = { ...blankEntry(p), ...(saved?.[p.id] || {}) };
+    for (const p of RAW_PRODUCTS) {
+      const s = saved?.[p.id] || {};
+      base[p.id] = {
+        ...blankEntry(p),          // factor de caja/display y "tiene display" vienen
+        cajas: s.cajas ?? 0,       // SIEMPRE de la fórmula matriz, para que las
+        display: s.display ?? 0,   // correcciones de datos se apliquen al actualizar;
+        unidades: s.unidades ?? 0, // solo el conteo del usuario se conserva.
+      };
+    }
     return base;
   });
   const [query, setQuery] = useState("");
