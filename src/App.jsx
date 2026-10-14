@@ -6,63 +6,73 @@ import {
 
 /* ------------------------------------------------------------------ *
  * DATOS BASE
- * Generados desde "Hoja de calculo para aplicacion movil.xlsx".
- * sec = sección de estante (8..1, tal como venían los divisores
- * "Product Description N" en la hoja original).
+ * Generados desde "Existencia_MexiLink.xlsx" (hoja Existencia).
+ * Mismo orden y mismas secciones que el Excel: Sección 1 → 8 y Check Lane.
+ * cost = Precio · factorCaja = Unid/Caja · factorDisplay = Unid/Display
+ * (hasDisplay solo si el Excel trae Unid/Display).
  * ------------------------------------------------------------------ */
+const SECTION_NAMES = {1: "Sección 1", 2: "Sección 2", 3: "Sección 3", 4: "Sección 4", 5: "Sección 5", 6: "Sección 6", 7: "Sección 7", 8: "Sección 8", 9: "Check Lane"};
+
 const RAW_PRODUCTS = [
-  { id: "p1", name: "DE LA ROSA MAZAPAN CHICA", sec: 8, cost: 3.07, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p2", name: "DE LA ROSA PULPARINDOTS", sec: 8, cost: 4.43, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
-  { id: "p3", name: "DE LA ROSA MAZAPAN CHOCOLATE", sec: 8, cost: 5.08, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p4", name: "RICOLINO DUVALIN TRISABOR", sec: 8, cost: 2.86, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p5", name: "DUVALIN HAZELNUT VANILLA", sec: 8, cost: 2.86, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p6", name: "(CHICLES) CANELS CHEWING GUM", sec: 8, cost: 3.25, factorCaja: 40, hasDisplay: false, factorDisplay: 1 },
-  { id: "p7", name: "EL AZTECA CUCHARITAS", sec: 8, cost: 2.69, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p8", name: "EL AZTECA FLECHAZOS MINI", sec: 8, cost: 11.33, factorCaja: 8, hasDisplay: false, factorDisplay: 1 },
-  { id: "p9", name: "LORENA PELON PELO RICO", sec: 8, cost: 5.18, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p10", name: "PELONETA", sec: 8, cost: 5.79, factorCaja: 18, hasDisplay: false, factorDisplay: 1 },
-  { id: "p11", name: "JARRITOS SOUR GUMMIES", sec: 7, cost: 2.68, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
-  { id: "p12", name: "DE LA ROSA CACAHUATE 900gr", sec: 7, cost: 6.59, factorCaja: 9, hasDisplay: false, factorDisplay: 1 },
-  { id: "p13", name: "DE LA ROSA CACAHUATE JPN NSHYMA", sec: 7, cost: 0.3, factorCaja: 200, hasDisplay: true, factorDisplay: 50 },
-  { id: "p14", name: "DE LA ROSA PULPARINDO AMARILLO", sec: 7, cost: 3.36, factorCaja: 16, hasDisplay: false, factorDisplay: 1 },
-  { id: "p15", name: "DE LA ROSA PULPARINDO ROJO", sec: 7, cost: 3.32, factorCaja: 32, hasDisplay: false, factorDisplay: 1 },
-  { id: "p16", name: "LORENA MINI PELON", sec: 7, cost: 2.79, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p17", name: "LORENA PELON RICO CHAMOY 12ct", sec: 7, cost: 5.18, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
-  { id: "p18", name: "LORENA MINI PELON SURTIDO", sec: 7, cost: 4.04, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
-  { id: "p19", name: "JARRITOS REGULAR GUMMIES", sec: 6, cost: 2.68, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
-  { id: "p20", name: "RICOLINO PALETA PAYASO", sec: 6, cost: 0.8, factorCaja: 60, hasDisplay: true, factorDisplay: 10 },
-  { id: "p21", name: "RICOLINO BUBU LUBU", sec: 6, cost: 0.64, factorCaja: 192, hasDisplay: true, factorDisplay: 24 },
-  { id: "p22", name: "PELONAZO", sec: 6, cost: 1.53, factorCaja: 48, hasDisplay: true, factorDisplay: 4 },
-  { id: "p23", name: "SKWINKLOTE", sec: 6, cost: 0.89, factorCaja: 144, hasDisplay: true, factorDisplay: 6 },
-  { id: "p24", name: "LUCAS GUSANO CHAMOY", sec: 6, cost: 0.61, factorCaja: 300, hasDisplay: true, factorDisplay: 10 },
-  { id: "p25", name: "LUCAS GUSANO TAMARIND", sec: 6, cost: 0.61, factorCaja: 300, hasDisplay: true, factorDisplay: 10 },
-  { id: "p26", name: "LUCAS BABY CHAMOY", sec: 6, cost: 0.47, factorCaja: 300, hasDisplay: true, factorDisplay: 10 },
-  { id: "p27", name: "LUCAS BABY MANGO", sec: 6, cost: 0.41, factorCaja: 300, hasDisplay: true, factorDisplay: 10 },
-  { id: "p28", name: "LUCAS SKWNKLES RELLENOS", sec: 5, cost: 0.59, factorCaja: 288, hasDisplay: true, factorDisplay: 12 },
-  { id: "p29", name: "LUCAS SKWNKLES CHUNKS", sec: 5, cost: 2.91, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
-  { id: "p30", name: "SALSAGHETI KING SIZE SANDIA", sec: 5, cost: 1.41, factorCaja: 120, hasDisplay: true, factorDisplay: 6 },
-  { id: "p31", name: "LUCAS SALSAGHETI MANGO", sec: 5, cost: 7.18, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
-  { id: "p32", name: "TAJIN PALETA BOLSA CHICA", sec: 4, cost: 2.8, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
-  { id: "p33", name: "BONBONUM TROPICAL", sec: 4, cost: 1.53, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
-  { id: "p34", name: "ZUMBA PALETA TAMARINDO", sec: 4, cost: 5.82, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
-  { id: "p35", name: "ZUMBA GOMA SANDIA", sec: 4, cost: 6.55, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
-  { id: "p36", name: "LA VAQUITA PALETA", sec: 4, cost: 3.41, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
-  { id: "p37", name: "LA VAQUITA CHOCOLOSO CARAMELOS", sec: 4, cost: 3.66, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
-  { id: "p38", name: "CANELS PINATERO", sec: 4, cost: 17.93, factorCaja: 6, hasDisplay: false, factorDisplay: 1 },
-  { id: "p39", name: "VERO ELOTE PALETA", sec: 3, cost: 4.94, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
-  { id: "p40", name: "VERO MANGO PALETA", sec: 3, cost: 4.94, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
-  { id: "p41", name: "VERO PINTA AZUL PALETA", sec: 3, cost: 4.94, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
-  { id: "p42", name: "VERO BANDA FUEGO MIX", sec: 3, cost: 4.94, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
-  { id: "p43", name: "VERO PICAGOMA FRESA", sec: 3, cost: 4.94, factorCaja: 8, hasDisplay: false, factorDisplay: 1 },
-  { id: "p44", name: "VERO RELLERINDOS", sec: 3, cost: 5.14, factorCaja: 8, hasDisplay: false, factorDisplay: 1 },
-  { id: "p45", name: "SONRICS ROCKALETA", sec: 2, cost: 7.48, factorCaja: 10, hasDisplay: false, factorDisplay: 1 },
-  { id: "p46", name: "DE LA ROSA PINATERO", sec: 1, cost: 16.61, factorCaja: 6, hasDisplay: false, factorDisplay: 1 },
-  { id: "p47", name: "RICOLINO RICOFIESTA", sec: 1, cost: 14.58, factorCaja: 4, hasDisplay: false, factorDisplay: 1 },
-  { id: "p48", name: "PALETA TAJIN BOLSA GRANDE", sec: 1, cost: 9.44, factorCaja: 10, hasDisplay: false, factorDisplay: 1 },
-  { id: "p49", name: "DE LA ROSA BOMBON GIGANTE", sec: 1, cost: 5.93, factorCaja: 10, hasDisplay: false, factorDisplay: 1 },
+  { id: "p1", name: "DELAROSA MAZAPAN DISP/24 CASE/12 CT", sec: 1, cost: 3.07, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "p2", name: "DELAROSA PULPARINDOTS WATERMELON DISPLAY12 CASE/12 EA/1.04OZ", sec: 1, cost: 4.43, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p3", name: "DELAROSA MAZAPAN W/CHOCOLAT DISP 24 CS/16 CT", sec: 1, cost: 5.08, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "p4", name: "DELAROSA PULPARINDO TAMARIND DISP/16 CASE/20 CT", sec: 1, cost: 3.36, factorCaja: 16, hasDisplay: false, factorDisplay: 1 },
+  { id: "p5", name: "DELAROSA PULPARINDO SPICY TAMARIND 32 CASE/DISP/ 20 CT", sec: 1, cost: 3.32, factorCaja: 32, hasDisplay: false, factorDisplay: 1 },
+  { id: "p6", name: "RICOLINO DUVALIN TRI SABOR 24 CASE/18 EA/.53 OZ", sec: 1, cost: 2.86, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "p7", name: "RICOLINO DUVALIN HAZELNUT VANILLA 24 CASE/18 EA/.53 OZ", sec: 1, cost: 2.86, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "p8", name: "CANELS 4P GUMPACK ORIG FLVR 40 TRAY/ 60 CT", sec: 1, cost: 3.25, factorCaja: 40, hasDisplay: false, factorDisplay: 1 },
+  { id: "p9", name: "AZTECA SPOON CHILI 24 BAG/22 EA/.40 OZ", sec: 1, cost: 2.69, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "p10", name: "DELAROSA NISHIYAMA CACAHUATE JAPONES 9 BAG/ 2 LBS", sec: 2, cost: 6.59, factorCaja: 9, hasDisplay: false, factorDisplay: 1 },
+  { id: "p11", name: "DELAROSA NISHIYAMA CACAHUATE BROWN 4 BAG/50 EA/2.11 OZ", sec: 2, cost: 0.3, factorCaja: 200, hasDisplay: true, factorDisplay: 50 },
+  { id: "p12", name: "LORENA PELON PELONAZO TAMARINDO 3.52 OZ OB X 12 DISP", sec: 2, cost: 1.53, factorCaja: 48, hasDisplay: true, factorDisplay: 4 },
+  { id: "p13", name: "LORENA MINI PELON PELO RICO 24 BAG/12 EA/.45 OZ", sec: 2, cost: 2.79, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "p14", name: "LORENA MINI PELON ASSORTED 20 BAG/18 EA/8.1 OZ", sec: 2, cost: 4.04, factorCaja: 20, hasDisplay: false, factorDisplay: 1 },
+  { id: "p15", name: "PELON PELONETA CANDY, 13.28 OZ", sec: 2, cost: 5.79, factorCaja: 18, hasDisplay: false, factorDisplay: 1 },
+  { id: "p16", name: "CANELS JARRITOS SOUR GUMMIES 12 BAG/8 OZ", sec: 2, cost: 2.68, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p17", name: "RICOLINO PALETA PAYASO DISPLAY 6 CASE/10 EA/1.59 OZ", sec: 3, cost: 0.8, factorCaja: 60, hasDisplay: true, factorDisplay: 10 },
+  { id: "p18", name: "RICOLINO BUBULUBU DISPLAY 8 CASE/24 EA/1.23 OZ", sec: 3, cost: 0.64, factorCaja: 192, hasDisplay: true, factorDisplay: 24 },
+  { id: "p19", name: "LUCAS GUSANO CHAMOY", sec: 3, cost: 6.1, factorCaja: 30, hasDisplay: false, factorDisplay: 1 },
+  { id: "p20", name: "LUCAS BABY CHAMOY", sec: 3, cost: 4.7, factorCaja: 300, hasDisplay: true, factorDisplay: 10 },
+  { id: "p21", name: "LUCAS BABY MANGO", sec: 3, cost: 0.41, factorCaja: 300, hasDisplay: true, factorDisplay: 10 },
+  { id: "p22", name: "LUCAS SKWINKLES RELLENOS PINA TAMARINDO 24 TRAY/12 EA/.92 OZ", sec: 3, cost: 0.59, factorCaja: 288, hasDisplay: true, factorDisplay: 12 },
+  { id: "p23", name: "CANELS JARRITOS REGULAR GUMMIES 12 BAG/8 OZ", sec: 3, cost: 2.68, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p24", name: "LUCAS GUMMIES SPICY WATERMELON", sec: 4, cost: 3.09, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "p25", name: "LUCAS GUMMIES SPICY MANGO", sec: 4, cost: 3.09, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "p26", name: "LUCAS SKWINKLOTE WATERMELON 24 TRAY/6 EA/1.41 OZ", sec: 4, cost: 0.89, factorCaja: 144, hasDisplay: true, factorDisplay: 6 },
+  { id: "p27", name: "LUCAS SALSAGHETI KING SIZE WATERMELON 20 CASE/6 EA/2.47 OZ", sec: 4, cost: 1.41, factorCaja: 120, hasDisplay: true, factorDisplay: 6 },
+  { id: "p28", name: "LUCAS SKWINKLES CHUNKS MANGO PEG 12 BAG/4.59 OZ", sec: 4, cost: 2.91, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p29", name: "DE LA ROSA PULPARINDO GUMMY RINGS MANGO 12 BAG /9oz", sec: 4, cost: 2.68, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p30", name: "DE LA ROSA PULPARINDO GUMMY RINGS WATERMELON 12 BAG /9oz", sec: 4, cost: 2.68, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p31", name: "SNACK PARADISE TAMASTRAWS WITH TAJÍN 12 DISPLAY /10 EA /", sec: 5, cost: 3.71, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p32", name: "SNACK PARADISE TAMAPOP WITH TAJÍN 12 DISPLAY /10 EA /", sec: 5, cost: 3.71, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p33", name: "BONBONBUM TAJIN WATERMELON 12 BAG/4 EA", sec: 5, cost: 2.8, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p34", name: "BONBONBUM TROP ASSORTED 12 BAG/6 OZ", sec: 5, cost: 1.53, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p35", name: "BONBONBUM 12 BAG/4 EA", sec: 5, cost: 1.6, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p36", name: "JUMEX GUMMIES TROPICAL MIX 2 TRAY /10 EA/ 5oz", sec: 5, cost: 3.09, factorCaja: 20, hasDisplay: true, factorDisplay: 10 },
+  { id: "p37", name: "JUMEX GUMMIES SPICY TROPICAL MIX 2 TRAY /10 EA/ 5oz", sec: 5, cost: 3.07, factorCaja: 20, hasDisplay: true, factorDisplay: 10 },
+  { id: "p38", name: "CNLS VAQUITA CARAMEL POPS, 11.85 OZ", sec: 5, cost: 3.41, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p39", name: "VERO GUMMY PICA FRESA 8 BAG/100 EA/.21 OZ", sec: 6, cost: 4.94, factorCaja: 8, hasDisplay: false, factorDisplay: 1 },
+  { id: "p40", name: "VERO LOLLIPOP ELOTE 7 BAG/40 EA/.49", sec: 6, cost: 4.94, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
+  { id: "p41", name: "VERO LOLLIPOP MANGO 7 BAG/40 EA/.49 OZ", sec: 6, cost: 4.94, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
+  { id: "p42", name: "VERO LOLLIPOP MIX FUEGO 7 BAG/40 EA/.51 OZ", sec: 6, cost: 4.94, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
+  { id: "p43", name: "VERO RELLERINDO 8 BAG/65 EA/.39 OZ", sec: 6, cost: 4.94, factorCaja: 8, hasDisplay: false, factorDisplay: 1 },
+  { id: "p44", name: "CANELS PINATERO MIX 6 BAG/4 LBS", sec: 6, cost: 17.93, factorCaja: 6, hasDisplay: false, factorDisplay: 1 },
+  { id: "p45", name: "SNRC ROCKALETA BAG, 20/.84 OZ", sec: 7, cost: 7.48, factorCaja: 10, hasDisplay: false, factorDisplay: 1 },
+  { id: "p46", name: "CANELS VAQUITA CHICLOSOS CARAMEL 7 BAGS / 12 OZ", sec: 7, cost: 3.66, factorCaja: 7, hasDisplay: false, factorDisplay: 1 },
+  { id: "p47", name: "DELAROSA PINATA MIX 6 BAG/4 LB", sec: 8, cost: 16.61, factorCaja: 6, hasDisplay: false, factorDisplay: 1 },
+  { id: "p48", name: "RICOLINO RICOFIESTA NEW MIX 4 BAG/3.3 LB/93 EA", sec: 8, cost: 14.58, factorCaja: 4, hasDisplay: false, factorDisplay: 1 },
+  { id: "p49", name: "BONBONBUM TAJIN PASSION FRUIT & WATERMELON 10 BAG/20 EA", sec: 8, cost: 9.44, factorCaja: 10, hasDisplay: false, factorDisplay: 1 },
+  { id: "p50", name: "DELAROSA SUPER GIANT MARSHMALLOW 10 BAG/25 OZ", sec: 8, cost: 5.93, factorCaja: 10, hasDisplay: false, factorDisplay: 1 },
+  { id: "p51", name: "ICEE FRUIT SOURS 4 OZ", sec: 9, cost: 1.86, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p52", name: "RICOLINO MINI PALETA PAYASO 1.76 OZ", sec: 9, cost: 1.36, factorCaja: 11, hasDisplay: false, factorDisplay: 1 },
+  { id: "p53", name: "RICOLINO BUBULUBU MARSHMELLOW 3.69 OZ", sec: 9, cost: 1.36, factorCaja: 10, hasDisplay: false, factorDisplay: 1 },
+  { id: "p54", name: "LORENA PELON MINI 1.35 OZ", sec: 9, cost: 1.31, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p55", name: "LUCAS SKWINKLES CHUNKS 2,47 OZ", sec: 9, cost: 3.1, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
+  { id: "p56", name: "DE LA ROSA MAZAPAN 4 OZ", sec: 9, cost: 1.81, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
 ];
 
-const STORAGE_KEY = "mexilink_inventario_v2";
+const STORAGE_KEY = "mexilink_inventario_v3";
 
 /* ------------------------------------------------------------------ *
  * PERSISTENCIA SEGURA
@@ -74,14 +84,14 @@ const storage = {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : null;
-    } catch {
+    } catch (e) {
       return null;
     }
   },
   save(value) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-    } catch {
+    } catch (e) {
       /* sin persistencia disponible: la app sigue funcionando en memoria */
     }
   },
@@ -104,7 +114,7 @@ function cleanRows(rows) {
   const out = [];
   for (const row of rows) {
     if (!Array.isArray(row) || row.length === 0) continue;
-    const name = String(row[0] ?? "").trim();
+    const name = String(row[0] == null ? "" : row[0]).trim();
     if (!name) continue;
     const low = name.toLowerCase();
     if (HEADER_TOKENS.has(low)) continue;            // encabezado repetido
@@ -167,20 +177,15 @@ const money = new Intl.NumberFormat("en-US", {
 });
 const num = new Intl.NumberFormat("en-US");
 
-const SECTIONS = [...new Set(RAW_PRODUCTS.map((p) => p.sec))].sort((a, b) => b - a);
+const SECTIONS = [...new Set(RAW_PRODUCTS.map((p) => p.sec))];
 
 export default function App() {
   const [entries, setEntries] = useState(() => {
     const saved = storage.load();
     const base = {};
     for (const p of RAW_PRODUCTS) {
-      const s = saved?.[p.id] || {};
-      base[p.id] = {
-        ...blankEntry(p),          // factor de caja/display y "tiene display" vienen
-        cajas: s.cajas ?? 0,       // SIEMPRE de la fórmula matriz, para que las
-        display: s.display ?? 0,   // correcciones de datos se apliquen al actualizar;
-        unidades: s.unidades ?? 0, // solo el conteo del usuario se conserva.
-      };
+      const sv = saved && saved[p.id];
+      base[p.id] = Object.assign({}, blankEntry(p), sv ? { cajas: toNum(sv.cajas), display: toNum(sv.display), unidades: toNum(sv.unidades) } : {});
     }
     return base;
   });
@@ -190,7 +195,14 @@ export default function App() {
   const [toast, setToast] = useState("");
   const fileRef = useRef(null);
 
-  useEffect(() => { storage.save(entries); }, [entries]);
+  useEffect(() => {
+    const counts = {};
+    for (const id in entries) {
+      const e = entries[id];
+      counts[id] = { cajas: e.cajas, display: e.display, unidades: e.unidades };
+    }
+    storage.save(counts);
+  }, [entries]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 2200);
@@ -264,7 +276,7 @@ export default function App() {
     const lines = [header.join(",")];
     let curSec = null;
     for (const p of RAW_PRODUCTS) {
-      if (p.sec !== curSec) { curSec = p.sec; lines.push(esc(`Sección ${p.sec}`)); }
+      if (p.sec !== curSec) { curSec = p.sec; lines.push(esc(SECTION_NAMES[p.sec])); }
       const e = entries[p.id];
       const it = calc.perItem[p.id];
       lines.push([
@@ -312,7 +324,7 @@ export default function App() {
           return next;
         });
         setToast(`Importados ${matched} productos`);
-      } catch {
+      } catch (e) {
         setToast("No se pudo leer el archivo");
       }
     };
@@ -396,7 +408,7 @@ export default function App() {
               >
                 <div className="flex items-center gap-2">
                   {isOpen ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
-                  <span className="text-sm font-semibold">Sección {sec}</span>
+                  <span className="text-sm font-semibold">{SECTION_NAMES[sec]}</span>
                   <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">
                     {items.length}
                   </span>
@@ -438,7 +450,7 @@ export default function App() {
             <Download className="h-4 w-4" /> Exportar CSV
           </button>
           <button
-            onClick={() => fileRef.current?.click()}
+            onClick={() => fileRef.current && fileRef.current.click()}
             className="flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-medium text-slate-200 active:bg-slate-800"
           >
             <Upload className="h-4 w-4" /> Importar
@@ -456,7 +468,7 @@ export default function App() {
             accept=".csv,text/csv"
             className="hidden"
             onChange={(e) => {
-              const f = e.target.files?.[0];
+              const f = e.target.files && e.target.files[0];
               if (f) importCSV(f);
               e.target.value = "";
             }}
@@ -496,7 +508,7 @@ function ProductRow({ product, entry, result, onStep, onSet, onUpdate, configOpe
     <li className="px-4 py-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium leading-tight">{p.name}</p>
+          <p className="text-sm font-medium leading-snug">{p.name}</p>
           <p className="mt-0.5 text-xs text-slate-500 tabular-nums">
             {money.format(p.cost)} c/u · factor caja ×{e.factorCaja}
             {e.hasDisplay && ` · display ×${e.factorDisplay}`}
