@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import {
-  Boxes, Search, Download, Upload, RotateCcw, Settings2,
+  Boxes, Search, Download, Upload, RotateCcw, Settings2, Sun, Moon,
   ChevronDown, ChevronRight, Plus, Minus, PackageOpen, Check, X,
 } from "lucide-react";
 
@@ -394,7 +394,7 @@ function InventarioView({ RAW_PRODUCTS, SECTION_NAMES, STORAGE_KEY, TITLE, FILE 
 
   /* ================================================================ */
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-28">
+    <div className="min-h-screen bg-slate-950 text-slate-100 pb-48">
       {/* ENCABEZADO FIJO */}
       <header className="sticky top-0 z-20 bg-slate-950 backdrop-blur border-b border-slate-800">
         <div className="mx-auto max-w-2xl px-4 pt-4 pb-3">
@@ -493,7 +493,7 @@ function InventarioView({ RAW_PRODUCTS, SECTION_NAMES, STORAGE_KEY, TITLE, FILE 
       </main>
 
       {/* BARRA DE ACCIONES FIJA */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-800 bg-slate-950 backdrop-blur">
+      <footer className="fixed inset-x-0 z-20 border-t border-slate-800 bg-slate-950 backdrop-blur" style={{ bottom: "calc(72px + env(safe-area-inset-bottom, 0px))" }}>
         <div className="mx-auto flex max-w-2xl items-center gap-2 px-4 py-3">
           <button
             onClick={exportCSV}
@@ -680,26 +680,44 @@ const TABS = [
   { id: "jjlg", label: "JJLG IMPORTERS" },
 ];
 
+const THEME_KEY = "inventario_tema_v1";
+
+/* Modo claro: cambia los colores oscuros de la app por claros */
+const LIGHT_CSS = `
+.theme-light.bg-slate-950, .theme-light .bg-slate-950 { background-color: #f1f5f9 !important; }
+.theme-light .bg-slate-900 { background-color: #ffffff !important; }
+.theme-light .bg-slate-800 { background-color: #e2e8f0 !important; }
+.theme-light .bg-slate-700 { background-color: #cbd5e1 !important; }
+.theme-light .border-slate-800 { border-color: #cbd5e1 !important; }
+.theme-light .border-slate-700 { border-color: #94a3b8 !important; }
+.theme-light .text-slate-100, .theme-light .text-slate-200 { color: #0f172a !important; }
+.theme-light .text-slate-300 { color: #334155 !important; }
+.theme-light .text-slate-400, .theme-light .text-slate-500 { color: #64748b !important; }
+.theme-light .text-slate-600 { color: #94a3b8 !important; }
+.theme-light .text-emerald-400 { color: #047857 !important; }
+.theme-light .text-emerald-300 { color: #065f46 !important; }
+.theme-light .text-amber-400 { color: #b45309 !important; }
+.theme-light .text-amber-300 { color: #92400e !important; }
+.theme-light .bg-emerald-900 { background-color: #d1fae5 !important; }
+.theme-light .bg-amber-900 { background-color: #fef3c7 !important; }
+.theme-light input, .theme-light select { color: #0f172a !important; }
+`;
+
 export default function App() {
   const [tab, setTab] = useState("mexi");
+  const [theme, setTheme] = useState(() => {
+    const saved = storage.load(THEME_KEY);
+    return saved === "light" ? "light" : "dark";
+  });
+  useEffect(() => { storage.save(THEME_KEY, theme); }, [theme]);
+  const light = theme === "light";
   return (
-    <div className="min-h-screen bg-slate-950">
-      <nav className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950">
-        <div className="mx-auto flex max-w-2xl gap-2 px-4 pt-3">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={
-                "flex-1 rounded-t-lg px-3 py-2 text-sm font-semibold " +
-                (tab === t.id ? "bg-slate-800 text-amber-400" : "text-slate-400")
-              }
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </nav>
+    <div
+      className={(light ? "theme-light " : "") + "min-h-screen bg-slate-950"}
+      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+    >
+      <style>{LIGHT_CSS}</style>
+
       {tab === "mexi" ? (
         <InventarioView
           key="mexi"
@@ -719,6 +737,33 @@ export default function App() {
           FILE="inventario-jjlg"
         />
       )}
+
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-800 bg-slate-950"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        <div className="mx-auto flex max-w-2xl items-stretch gap-2 px-3 py-2">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={
+                "flex-1 rounded-lg py-3 text-sm font-semibold " +
+                (tab === t.id ? "bg-amber-500 text-slate-950" : "bg-slate-900 text-slate-400")
+              }
+            >
+              {t.label}
+            </button>
+          ))}
+          <button
+            onClick={() => setTheme(light ? "dark" : "light")}
+            aria-label={light ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
+            className="grid w-12 place-items-center rounded-lg bg-slate-900 text-slate-300"
+          >
+            {light ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          </button>
+        </div>
+      </nav>
     </div>
   );
 }
