@@ -11,9 +11,9 @@ import {
  * cost = Precio · factorCaja = Unid/Caja · factorDisplay = Unid/Display
  * (hasDisplay solo si el Excel trae Unid/Display).
  * ------------------------------------------------------------------ */
-const SECTION_NAMES = {1: "Sección 1", 2: "Sección 2", 3: "Sección 3", 4: "Sección 4", 5: "Sección 5", 6: "Sección 6", 7: "Sección 7", 8: "Sección 8", 9: "Check Lane"};
+const MEXI_NAMES = {1: "Sección 1", 2: "Sección 2", 3: "Sección 3", 4: "Sección 4", 5: "Sección 5", 6: "Sección 6", 7: "Sección 7", 8: "Sección 8", 9: "Check Lane"};
 
-const RAW_PRODUCTS = [
+const MEXI_PRODUCTS = [
   { id: "p1", name: "DELAROSA MAZAPAN DISP/24 CASE/12 CT", sec: 1, cost: 3.07, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
   { id: "p2", name: "DELAROSA PULPARINDOTS WATERMELON DISPLAY12 CASE/12 EA/1.04OZ", sec: 1, cost: 4.43, factorCaja: 12, hasDisplay: false, factorDisplay: 1 },
   { id: "p3", name: "DELAROSA MAZAPAN W/CHOCOLAT DISP 24 CS/16 CT", sec: 1, cost: 5.08, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
@@ -72,7 +72,8 @@ const RAW_PRODUCTS = [
   { id: "p56", name: "DE LA ROSA MAZAPAN 4 OZ", sec: 9, cost: 1.81, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
 ];
 
-const STORAGE_KEY = "mexilink_inventario_v3";
+const MEXI_KEY = "mexilink_inventario_v3";
+const JJLG_KEY = "jjlg_inventario_v1";
 
 /* ------------------------------------------------------------------ *
  * PERSISTENCIA SEGURA
@@ -80,17 +81,17 @@ const STORAGE_KEY = "mexilink_inventario_v3";
  * sandbox, modo privado, etc.) cae a memoria sin romper la app.
  * ------------------------------------------------------------------ */
 const storage = {
-  load() {
+  load(key) {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : null;
     } catch (e) {
       return null;
     }
   },
-  save(value) {
+  save(key, value) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+      localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
       /* sin persistencia disponible: la app sigue funcionando en memoria */
     }
@@ -177,11 +178,62 @@ const money = new Intl.NumberFormat("en-US", {
 });
 const num = new Intl.NumberFormat("en-US");
 
-const SECTIONS = [...new Set(RAW_PRODUCTS.map((p) => p.sec))];
 
-export default function App() {
+/* ------------------------------------------------------------------ *
+ * DATOS JJLG IMPORTERS
+ * Generados desde "Existencia_Semana52_final.xlsx" (hoja Existencia).
+ * cost = Precio · factorCaja = Unid/Caja · factorDisplay = Unid/Display
+ * ------------------------------------------------------------------ */
+const JJLG_NAMES = { 1: "Sección 1", 2: "Sección 2", 3: "Sección 3", 4: "Sección 4", 5: "Sección 5", 6: "Sección 6", 7: "Sección Especial" };
+
+const JJLG_PRODUCTS = [
+  { id: "j1", name: "Burrito Tamarindo 3oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j2", name: "Burrito Mango 2.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j3", name: "Martillo Tamarindo 3oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j4", name: "Martillo Mango 2.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j5", name: "Cocadas Mix 3.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j6", name: "Cocada Bandera 3.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j7", name: "Garapiñado 3.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j8", name: "Cacahuate Chile & Limon 3.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j9", name: "Cacahuate Japones 3.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j10", name: "Palanquetas 3.5oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j11", name: "Alegrias Amarantos 2.1oz", sec: 1, cost: 1.5, factorCaja: 80, hasDisplay: true, factorDisplay: 20 },
+  { id: "j12", name: "Semilla Tostada 2oz", sec: 1, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j13", name: "Relle Rollo Tamarindo. 2.5oz", sec: 2, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j14", name: "Relle Rollo Mango 2.5oz", sec: 2, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j15", name: "Relle Rollo Guayaba 2.5oz", sec: 2, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j16", name: "Relle Rollo Ciruela 2.5oz", sec: 2, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j17", name: "Relle Rollo Piña Colada 2.5oz", sec: 3, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j18", name: "Greñas Tamarindo 2.5oz", sec: 3, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j19", name: "Tamarindo Bars 2.5oz", sec: 3, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j20", name: "Spiced Serpentina 2.5oz", sec: 3, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j21", name: "Frutakitos Tamarindo 2.5oz", sec: 4, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j22", name: "Rielitos 2.5oz", sec: 4, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j23", name: "Mango Chile 2.5oz", sec: 4, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j24", name: "Hostias el Leoncito 2.5oz", sec: 4, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j25", name: "Mango Pop 2.5oz", sec: 5, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j26", name: "Rebanaditas de sandia 2.5oz", sec: 5, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j27", name: "Gummy Worms 2.5oz", sec: 5, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j28", name: "Obleas con Cajeta de Leche 2.5oz", sec: 5, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j29", name: "Churritos Mexicanos Sal & Limon 4.2oz", sec: 6, cost: 1.5, factorCaja: 35, hasDisplay: false, factorDisplay: 1 },
+  { id: "j30", name: "Churritos Mexicanos Chile & Limon 4.2oz", sec: 6, cost: 1.5, factorCaja: 35, hasDisplay: false, factorDisplay: 1 },
+  { id: "j31", name: "Churros Locos Naturales 5oz", sec: 6, cost: 1.5, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "j32", name: "Churros Locos Chile & Limon 5oz", sec: 6, cost: 1.5, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "j33", name: "Saladitas Chile 2.5oz", sec: 7, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j34", name: "Saladitas naturales 2.5oz", sec: 7, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j35", name: "El súper León picositas 2.5oz", sec: 7, cost: 1.5, factorCaja: 144, hasDisplay: true, factorDisplay: 12 },
+  { id: "j36", name: "Tama Bola 3.5oz", sec: 7, cost: 1.5, factorCaja: 96, hasDisplay: true, factorDisplay: 24 },
+  { id: "j37", name: "Contenedor Sandías", sec: 7, cost: 2.93, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+  { id: "j38", name: "Contenedor mango", sec: 7, cost: 2.93, factorCaja: 24, hasDisplay: false, factorDisplay: 1 },
+];
+
+/* ------------------------------------------------------------------ *
+ * APP: dos pestañas, cada una con su propio inventario
+ * ------------------------------------------------------------------ */
+function InventarioView({ RAW_PRODUCTS, SECTION_NAMES, STORAGE_KEY, TITLE, FILE }) {
+  const SECTIONS = [...new Set(RAW_PRODUCTS.map((p) => p.sec))];
   const [entries, setEntries] = useState(() => {
-    const saved = storage.load();
+    const saved = storage.load(STORAGE_KEY);
     const base = {};
     for (const p of RAW_PRODUCTS) {
       const sv = saved && saved[p.id];
@@ -201,7 +253,7 @@ export default function App() {
       const e = entries[id];
       counts[id] = { cajas: e.cajas, display: e.display, unidades: e.unidades };
     }
-    storage.save(counts);
+    storage.save(STORAGE_KEY, counts);
   }, [entries]);
   useEffect(() => {
     if (!toast) return;
@@ -293,7 +345,7 @@ export default function App() {
     const a = document.createElement("a");
     const stamp = new Date().toISOString().slice(0, 10);
     a.href = url;
-    a.download = `inventario-mexilink-${stamp}.csv`;
+    a.download = `${FILE}-${stamp}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     setToast("CSV exportado");
@@ -351,7 +403,7 @@ export default function App() {
               <Boxes className="h-5 w-5" strokeWidth={2.4} />
             </div>
             <div className="leading-tight">
-              <h1 className="text-base font-semibold tracking-tight">Inventario MexiLink</h1>
+              <h1 className="text-base font-semibold tracking-tight">{TITLE}</h1>
               <p className="text-xs text-slate-400">Conteo semanal · Ruta King Soopers</p>
             </div>
           </div>
@@ -620,5 +672,53 @@ function FactorField({ label, value, onChange }) {
         className="w-20 rounded-md border border-slate-700 bg-slate-900 py-1.5 text-center text-sm font-semibold tabular-nums outline-none focus:border-amber-500"
       />
     </label>
+  );
+}
+
+const TABS = [
+  { id: "mexi", label: "MexiLink" },
+  { id: "jjlg", label: "JJLG IMPORTERS" },
+];
+
+export default function App() {
+  const [tab, setTab] = useState("mexi");
+  return (
+    <div className="min-h-screen bg-slate-950">
+      <nav className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950">
+        <div className="mx-auto flex max-w-2xl gap-2 px-4 pt-3">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={
+                "flex-1 rounded-t-lg px-3 py-2 text-sm font-semibold " +
+                (tab === t.id ? "bg-slate-800 text-amber-400" : "text-slate-400")
+              }
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </nav>
+      {tab === "mexi" ? (
+        <InventarioView
+          key="mexi"
+          RAW_PRODUCTS={MEXI_PRODUCTS}
+          SECTION_NAMES={MEXI_NAMES}
+          STORAGE_KEY={MEXI_KEY}
+          TITLE="Inventario MexiLink"
+          FILE="inventario-mexilink"
+        />
+      ) : (
+        <InventarioView
+          key="jjlg"
+          RAW_PRODUCTS={JJLG_PRODUCTS}
+          SECTION_NAMES={JJLG_NAMES}
+          STORAGE_KEY={JJLG_KEY}
+          TITLE="Inventario JJLG IMPORTERS"
+          FILE="inventario-jjlg"
+        />
+      )}
+    </div>
   );
 }
